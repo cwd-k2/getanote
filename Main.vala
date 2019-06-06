@@ -1,4 +1,4 @@
 public static int main (string[] args) {
-    HelloWorld.Application app = new HelloWorld.Application ();
+    ShinGeta.Application app = new ShinGeta.Application ();
     return app.run ();
 }

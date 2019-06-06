@@ -1,8 +1,7 @@
-namespace HelloWorld {
-
+namespace ShinGeta {
     public class MainWindow : Gtk.ApplicationWindow {
 
-        private Gtk.Label label;
+        public Gtk.Label label;
 
         public MainWindow (Application app) {
             Object (
@@ -10,16 +9,9 @@ namespace HelloWorld {
             );
 
             this.label = new Gtk.Label ("");
-            set_title ("Hello!");
+            this.add (label);
 
-            this.key_press_event.connect ( (w, key) => {
-                stdout.printf ("key pressed: %u, %ld, %s\n", key.keyval, key.time, key.str);
-                return true;
-            });
-
-            show_all ();
+            this.show_all ();
         }
-
-
     }
 }

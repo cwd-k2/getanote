@@ -18,6 +18,11 @@ namespace ShinGeta {
 
             window.key_press_event.connect ( (_, key) => {
 
+                if (key.str == keymap.backspace) {
+                    window.view.backspace ();
+                    return true;
+                }
+
                 if (key.is_modifier != 1 && key.str in keymap.layout) {
 
                     engine.event_key_queue.push (key);
@@ -29,11 +34,7 @@ namespace ShinGeta {
             });
 
             engine.output_event.connect ( (_, str) => {
-                if (str == "BS") {
-                    //window.view.backspace ();
-                } else {
-                    window.buffer.insert_at_cursor (str, str.length);
-                }
+                window.buffer.insert_at_cursor (str, str.length);
             });
 
             engine.run ();

@@ -12,18 +12,28 @@ namespace ShinGeta {
 
             var window = new MainWindow (this);
 
-            var keymap = new KeyMap ();
+            var keymap = new KeyMap ("JIS");
 
             var engine = new Engine (keymap);
 
             window.key_press_event.connect ( (_, key) => {
-                engine.event_key_queue.push (key);
-                return true;
+
+                if (key.is_modifier != 1 && key.str in keymap.layout) {
+
+                    engine.event_key_queue.push (key);
+
+                    return true;
+                }
+
+                return false;
             });
 
             engine.output_event.connect ( (_, str) => {
-                window.label.label = str;
-                window.show_all ();
+                if (str == "BS") {
+                    //window.view.backspace ();
+                } else {
+                    window.buffer.insert_at_cursor (str, str.length);
+                }
             });
 
             engine.run ();

@@ -2,14 +2,18 @@ namespace ShinGeta {
     public class MainWindow : Gtk.ApplicationWindow {
 
         public Gtk.Label label;
+        public Gtk.TextView view;
+        public Gtk.TextBuffer buffer;
 
         public MainWindow (Application app) {
             Object (
                 application: app
             );
 
-            this.label = new Gtk.Label ("");
-            this.add (label);
+            this.buffer = new Gtk.TextBuffer (null);
+            this.view   = new Gtk.TextView.with_buffer (this.buffer);
+
+            this.add (view);
 
             this.show_all ();
         }

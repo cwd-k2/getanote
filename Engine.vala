@@ -4,11 +4,16 @@ namespace ShinGeta {
     public class Engine : Object {
 
         public AsyncQueue <EventKey> event_key_queue;
-        public Thread <void *> main_thread;
+
         public signal void output_event (string str);
-        public signal void quit ();
 
         public KeyMap keymap;
+
+        private bool simultaneous;
+        private bool running;
+        private Thread <void *> main_thread;
+        private EventKey? curr;
+        private EventKey? prev;
 
         public Engine (KeyMap keymap) {
             Object ();
@@ -17,48 +22,71 @@ namespace ShinGeta {
         }
 
         public void run () {
-            main_thread = new Thread <void *> ("Engine thread", main_loop);
+            this.running = true;
+            this.main_thread = new Thread <void *> ("Engine Thread", main_loop);
+        }
+
+        public void stop () {
+            this.running = false;
+            this.main_thread.join ();
         }
 
         private void * main_loop () {
-            EventKey  key;
-            EventKey? prev = null;
-            string?   out_str;
+            this.prev = null;
+            this.simultaneous = false;
 
-            string[]  buffer = {};
-            uint      buflen = 0;
+            string? out_str;
 
-            while (true) {
-                key = this.event_key_queue.pop ();
+            while (this.running) {
 
-                stdout.printf ("key pressed: %u, %s\n", key.keyval, key.str);
+                this.curr = this.event_key_queue.pop ();
+                stdout.printf ("key pressed: %u, %s\n", this.curr.keyval, this.curr.str);
 
-                if (key.is_modifier != 1) {
+                if (this.prev != null) {
 
-                    if (prev != null && key.time - prev.time < 50) {
-                        out_str = interpret_shift_input (prev, key);
-                    } else {
-                        out_str = this.keymap.neutral.get (key.str);
-                    }
+                    if (this.prev.str != this.curr.str) {
 
-                    if (out_str != null) {
-                        if (out_str == "BS") {
-                            if (buflen > 0) {
-                                buflen--;
-                                buffer = buffer[0:buflen];
+                        if (this.prev.str in this.keymap.shift_keys
+                            || this.curr.str in this.keymap.shift_keys) {
+
+                            out_str = interpret_shift_input (this.prev, this.curr);
+
+                            if (out_str != null) {
+                                this.simultaneous = true;
+                                output_event (out_str);
+                                this.prev = null;
+                            } else {
+                                this.simultaneous = false;
+                                new Thread <void *> ("Subroutine thread", subroutine);
+                                this.prev = this.curr;
                             }
                         } else {
-                            buffer += out_str;
-                            buflen++;
+                            this.simultaneous = false;
+                            new Thread <void *> ("Subroutine thread", subroutine);
+                            this.prev = this.curr;
                         }
-                        output_event (string.joinv ("", buffer));
+                    } else {
+                        this.prev = this.curr;
                     }
 
-                    prev = key;
-
+                } else {
+                    this.simultaneous = false;
+                    new Thread <void *> ("Subroutine thread", subroutine);
+                    this.prev = this.curr;
                 }
 
             }
+
+            return null;
+
+        }
+
+        private void * subroutine () {
+            var out_str = this.keymap.neutral.get (this.curr.str);
+            Thread.usleep (50000);
+            if (!this.simultaneous && out_str != null) output_event (out_str);
+            this.prev = null;
+            return null;
         }
 
         private string? interpret_shift_input (EventKey prev, EventKey key) {
@@ -78,7 +106,7 @@ namespace ShinGeta {
                         case "s":
                             return this.keymap.shift_r.get (prev.str);
                         default:
-                            return this.keymap.neutral.get (key.str);
+                            return null;
                     }
             }
         }

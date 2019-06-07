@@ -1,6 +1,4 @@
 namespace ShinGeta {
-    using Gdk;
-
     public class Engine : Object {
 
         public signal void output_event (string str);

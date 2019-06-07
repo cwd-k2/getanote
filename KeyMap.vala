@@ -18,7 +18,8 @@ namespace ShinGeta {
 
         public string[] shift_keys = {
             "k", "d",
-            "l", "s"
+            "l", "s",
+            "i", "o"
         };
 
         public string?[] kana_neutral = {
@@ -43,9 +44,17 @@ namespace ShinGeta {
         };
 
         public string?[] kana_contr_m = {
+            "ゅ",   "びゃ", "びゅ", "びょ", null,   null, null, null, null, null, null,
+            "ひゅ", "しゅ", "しょ", "きゅ", "ちゅ", null, null, null, null, null, null,
+            "ひょ",   null,   null, "きょ", "ちょ", null, null, null, null, null,
+            "ひゃ",   null, "しゃ", "きゃ", "ちゃ", null, null, null, null, null
         };
 
         public string?[] kana_contr_r = {
+            "ょ",   "ぴゃ", "ぴゅ", "ぴょ", null,   null, null, null, null, null, null,
+            "りゅ", "じゅ", "じょ", "ぎゅ", "にゅ", null, null, null, null, null, null,
+            "りょ",   null,   null, "ぎょ", "にょ", null, null, null, null, null,
+            "りゃ",   null, "じゃ", "ぎゃ", "にゃ", null, null, null, null, null
         };
 
 
@@ -64,7 +73,7 @@ namespace ShinGeta {
             this.shift_m = new HashTable <string, string?> (str_hash, str_equal);
             this.shift_r = new HashTable <string, string?> (str_hash, str_equal);
             this.contr_m = new HashTable <string, string?> (str_hash, str_equal);
-            this.shift_r = new HashTable <string, string?> (str_hash, str_equal);
+            this.contr_r = new HashTable <string, string?> (str_hash, str_equal);
 
             switch (layout) {
                 case "JIS":
@@ -84,6 +93,8 @@ namespace ShinGeta {
                 this.neutral.insert (this.layout[i], kana_neutral[i]);
                 this.shift_m.insert (this.layout[i], kana_shift_m[i]);
                 this.shift_r.insert (this.layout[i], kana_shift_r[i]);
+                this.contr_m.insert (this.layout[i], kana_contr_m[i]);
+                this.contr_r.insert (this.layout[i], kana_contr_r[i]);
             }
         }
 

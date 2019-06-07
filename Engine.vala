@@ -83,6 +83,10 @@ namespace ShinGeta {
                 case "l":
                 case "s":
                     return this.keymap.shift_r.get (key.str);
+                case "i":
+                    return this.keymap.contr_m.get (key.str);
+                case "o":
+                    return this.keymap.contr_r.get (key.str);
                 default:
                     switch (key.str) {
                         case "k":
@@ -91,6 +95,10 @@ namespace ShinGeta {
                         case "l":
                         case "s":
                             return this.keymap.shift_r.get (prev.str);
+                        case "i":
+                            return this.keymap.contr_m.get (prev.str);
+                        case "o":
+                            return this.keymap.contr_r.get (prev.str);
                         default:
                             return null;
                     }

@@ -24,7 +24,7 @@ namespace ShinGeta {
                 }
 
                 if (key.is_modifier != 1 && key.str in keymap.layout) {
-                    engine.event_key_queue.push (key);
+                    engine.event_key_queue.push (key.str);
                     return true;
                 }
 

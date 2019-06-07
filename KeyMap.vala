@@ -76,16 +76,14 @@ namespace ShinGeta {
             this.contr_r = new HashTable <string, string?> (str_hash, str_equal);
 
             switch (layout) {
-                case "JIS":
-                    this.layout = jis_layout;
-                    this.backspace = ":";
-                    break;
                 case "US":
                     this.layout = us_layout;
                     this.backspace = "'";
                     break;
+                case "JIS":
                 default:
                     this.layout = jis_layout;
+                    this.backspace = ":";
                     break;
             }
 

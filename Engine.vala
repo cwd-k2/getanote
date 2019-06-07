@@ -6,17 +6,17 @@ namespace ShinGeta {
         public signal void output_event (string str);
 
         public KeyMap keymap;
-        public AsyncQueue <EventKey> event_key_queue;
+        public AsyncQueue <string> event_key_queue;
 
         private bool simultaneous;
         private bool running;
         private Thread <void *> main_thread;
-        private EventKey? curr;
-        private EventKey? prev;
+        private string? curr;
+        private string? prev;
 
         public Engine (KeyMap keymap) {
             Object ();
-            this.event_key_queue = new AsyncQueue <EventKey> ();
+            this.event_key_queue = new AsyncQueue <string> ();
             this.keymap = keymap;
         }
 
@@ -40,7 +40,7 @@ namespace ShinGeta {
 
                 this.simultaneous = false;
 
-                if (this.prev != null && this.prev.str != this.curr.str) {
+                if (this.prev != null && this.prev != this.curr) {
 
                     out_str = interpret_shift_input (this.prev, this.curr);
 
@@ -63,7 +63,7 @@ namespace ShinGeta {
         }
 
         private void * subroutine () {
-            var out_str = this.keymap.neutral.get (this.curr.str);
+            var out_str = this.keymap.neutral.get (this.curr);
 
             Thread.usleep (25000);
 
@@ -75,30 +75,30 @@ namespace ShinGeta {
             return null;
         }
 
-        private string? interpret_shift_input (EventKey prev, EventKey key) {
-            switch (prev.str) {
+        private string? interpret_shift_input (string prev, string key) {
+            switch (prev) {
                 case "k":
                 case "d":
-                    return this.keymap.shift_m.get (key.str);
+                    return this.keymap.shift_m.get (key);
                 case "l":
                 case "s":
-                    return this.keymap.shift_r.get (key.str);
+                    return this.keymap.shift_r.get (key);
                 case "i":
-                    return this.keymap.contr_m.get (key.str);
+                    return this.keymap.contr_m.get (key);
                 case "o":
-                    return this.keymap.contr_r.get (key.str);
+                    return this.keymap.contr_r.get (key);
                 default:
-                    switch (key.str) {
+                    switch (key) {
                         case "k":
                         case "d":
-                            return this.keymap.shift_m.get (prev.str);
+                            return this.keymap.shift_m.get (prev);
                         case "l":
                         case "s":
-                            return this.keymap.shift_r.get (prev.str);
+                            return this.keymap.shift_r.get (prev);
                         case "i":
-                            return this.keymap.contr_m.get (prev.str);
+                            return this.keymap.contr_m.get (prev);
                         case "o":
-                            return this.keymap.contr_r.get (prev.str);
+                            return this.keymap.contr_r.get (prev);
                         default:
                             return null;
                     }

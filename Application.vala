@@ -11,12 +11,12 @@ namespace ShinGeta {
         protected override void activate () {
 
             var window = new MainWindow (this);
-
             var keymap = new KeyMap ("JIS");
-
             var engine = new Engine (keymap);
 
             window.key_press_event.connect ( (_, key) => {
+
+                stdout.printf ("key pressed: %u, %s\n", key.keyval, key.str);
 
                 if (key.str == keymap.backspace) {
                     window.view.backspace ();
@@ -24,9 +24,7 @@ namespace ShinGeta {
                 }
 
                 if (key.is_modifier != 1 && key.str in keymap.layout) {
-
                     engine.event_key_queue.push (key);
-
                     return true;
                 }
 
@@ -38,7 +36,6 @@ namespace ShinGeta {
             });
 
             engine.run ();
-
             add_window (window);
         }
 

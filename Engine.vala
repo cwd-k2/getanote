@@ -3,11 +3,10 @@ namespace ShinGeta {
 
     public class Engine : Object {
 
-        public AsyncQueue <EventKey> event_key_queue;
-
         public signal void output_event (string str);
 
         public KeyMap keymap;
+        public AsyncQueue <EventKey> event_key_queue;
 
         private bool simultaneous;
         private bool running;
@@ -33,44 +32,26 @@ namespace ShinGeta {
 
         private void * main_loop () {
             this.prev = null;
-            this.simultaneous = false;
-
             string? out_str;
 
             while (this.running) {
 
                 this.curr = this.event_key_queue.pop ();
-                stdout.printf ("key pressed: %u, %s\n", this.curr.keyval, this.curr.str);
 
-                if (this.prev != null) {
+                this.simultaneous = false;
 
-                    if (this.prev.str != this.curr.str) {
+                if (this.prev != null && this.prev.str != this.curr.str) {
 
-                        if (this.prev.str in this.keymap.shift_keys
-                            || this.curr.str in this.keymap.shift_keys) {
+                    out_str = interpret_shift_input (this.prev, this.curr);
 
-                            out_str = interpret_shift_input (this.prev, this.curr);
-
-                            if (out_str != null) {
-                                this.simultaneous = true;
-                                output_event (out_str);
-                                this.prev = null;
-                            } else {
-                                this.simultaneous = false;
-                                new Thread <void *> ("Subroutine thread", subroutine);
-                                this.prev = this.curr;
-                            }
-                        } else {
-                            this.simultaneous = false;
-                            new Thread <void *> ("Subroutine thread", subroutine);
-                            this.prev = this.curr;
-                        }
-                    } else {
-                        this.prev = this.curr;
+                    if (out_str != null) {
+                        this.simultaneous = true;
+                        output_event (out_str);
+                        this.prev = null;
                     }
+                }
 
-                } else {
-                    this.simultaneous = false;
+                if (!simultaneous) {
                     new Thread <void *> ("Subroutine thread", subroutine);
                     this.prev = this.curr;
                 }
@@ -83,9 +64,14 @@ namespace ShinGeta {
 
         private void * subroutine () {
             var out_str = this.keymap.neutral.get (this.curr.str);
-            Thread.usleep (50000);
-            if (!this.simultaneous && out_str != null) output_event (out_str);
-            this.prev = null;
+
+            Thread.usleep (25000);
+
+            if (!this.simultaneous && out_str != null) {
+                output_event (out_str);
+                this.prev = null;
+            }
+
             return null;
         }
 

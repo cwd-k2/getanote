@@ -75,30 +75,30 @@ namespace ShinGeta {
             return null;
         }
 
-        private string? interpret_shift_input (string prev, string key) {
-            switch (prev) {
+        private string? interpret_shift_input (string key1, string key2) {
+            switch (key1) {
                 case "k":
                 case "d":
-                    return this.keymap.shift_m.get (key);
+                    return this.keymap.shift_m.get (key2);
                 case "l":
                 case "s":
-                    return this.keymap.shift_r.get (key);
+                    return this.keymap.shift_r.get (key2);
                 case "i":
-                    return this.keymap.contr_m.get (key);
+                    return this.keymap.contr_m.get (key2);
                 case "o":
-                    return this.keymap.contr_r.get (key);
+                    return this.keymap.contr_r.get (key2);
                 default:
-                    switch (key) {
+                    switch (key2) {
                         case "k":
                         case "d":
-                            return this.keymap.shift_m.get (prev);
+                            return this.keymap.shift_m.get (key1);
                         case "l":
                         case "s":
-                            return this.keymap.shift_r.get (prev);
+                            return this.keymap.shift_r.get (key1);
                         case "i":
-                            return this.keymap.contr_m.get (prev);
+                            return this.keymap.contr_m.get (key1);
                         case "o":
-                            return this.keymap.contr_r.get (prev);
+                            return this.keymap.contr_r.get (key1);
                         default:
                             return null;
                     }

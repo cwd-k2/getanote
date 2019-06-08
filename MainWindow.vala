@@ -17,10 +17,11 @@ namespace GetaNote {
 
             this.buffer = new Gtk.TextBuffer (null);
             this.view   = new Gtk.TextView.with_buffer (this.buffer);
+            this.view.set_wrap_mode (Gtk.WrapMode.WORD_CHAR);
 
             var header  = new Gtk.HeaderBar ();
             header.set_show_close_button (true);
-            header.set_title ("新下駄配列");
+            header.set_title ("下駄ノート");
 
             var copy_button = new Gtk.Button ();
             copy_button.set_label ("Copy");
@@ -42,7 +43,7 @@ namespace GetaNote {
             });
 
             hbox.pack_end (ime_toggle, false, false, 10);
-            hbox.pack_end (new Gtk.Label ("新下駄IMEを有効化"), false, false, 5);
+            hbox.pack_end (new Gtk.Label ("ビルトインのFEPを有効化"), false, false, 5);
 
             vbox.pack_start (this.view);
             vbox.pack_end (hbox, false, false);

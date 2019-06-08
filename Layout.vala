@@ -47,7 +47,7 @@ namespace ShinGeta {
                 this.keys = keys;
 
             } catch (Error e) {
-                stderr.printf ("Cannot load layout file... %s\n", e.message);
+                stderr.printf ("Cannot load layout file: %s\n", e.message);
             }
         }
 

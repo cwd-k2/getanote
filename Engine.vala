@@ -6,11 +6,8 @@ namespace ShinGeta {
         public KeyMap keymap;
         public AsyncQueue <string> event_key_queue;
 
-        private bool simultaneous;
         private bool running;
         private Thread <void *> main_thread;
-        private string? curr;
-        private string? prev;
 
         public Engine (KeyMap keymap) {
             Object ();
@@ -29,30 +26,26 @@ namespace ShinGeta {
         }
 
         private void * main_loop () {
-            //this.prev = null;
             string? out_str;
+            string? curr, next, back;
 
             while (this.running) {
 
-                this.curr = this.event_key_queue.pop ();
+                curr = this.event_key_queue.pop ();
 
-                this.simultaneous = false;
-
-                if (this.prev != null && this.prev != this.curr) {
-
-                    out_str = this.keymap.interpret ({this.prev, this.curr});
-
-                    if (out_str != null) {
-                        this.simultaneous = true;
-                        output_event (out_str);
-                        this.prev = null;
-                    }
+                if (this.event_key_queue.length () < 1) {
+                    Thread.usleep (20000);
                 }
 
-                if (!simultaneous) {
-                    new Thread <void *> ("Subroutine thread", subroutine);
-                    this.prev = this.curr;
+                next = this.event_key_queue.try_pop ();
+
+                out_str = interpret (curr, next, out back);
+
+                if (back != null) {
+                    this.event_key_queue.push_front (back);
                 }
+
+                output_event (out_str);
 
             }
 
@@ -60,17 +53,17 @@ namespace ShinGeta {
 
         }
 
-        private void * subroutine () {
-            var out_str = this.keymap.interpret ({this.curr});
+        private string interpret (string curr, string? next, out string back) {
+            var retval = this.keymap.mapping.get (string.join ("+", curr, next));
+            back = null;
 
-            Thread.usleep (25000);
-
-            if (!this.simultaneous && out_str != null) {
-                output_event (out_str);
-                this.prev = null;
+            if (retval == null) {
+                back = next;
+                retval = this.keymap.mapping.get (curr);
             }
 
-            return null;
+            return retval;
+
         }
 
     }

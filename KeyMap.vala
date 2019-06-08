@@ -18,7 +18,7 @@ namespace ShinGeta {
             "z", "x", "c", "v", "b", "n", "m", ",", ".", "/"
         };
 
-        public string?[] kana_neutral = {
+        public string[] kana_neutral = {
             "１", "２", "３", "４", "５", "６", "７", "８", "９", "０", "ー",
             "ー", "に", "は", "、", "ち", "ぐ", "ば", "こ", "が", "ひ", "げ",
             "の", "と", "か", "ん", "っ", "く", "う", "い", "し", "な",
@@ -56,7 +56,7 @@ namespace ShinGeta {
         public string[] layout;
         public string   backspace;
 
-        private HashTable <string, string?> mapping;
+        public HashTable <string, string?> mapping;
 
         public KeyMap (string layout) {
             Object ();
@@ -106,10 +106,6 @@ namespace ShinGeta {
                 }
 
             }
-        }
-
-        public string? interpret (string[] keys) {
-            return this.mapping.get (string.joinv ("+", keys));
         }
 
     }

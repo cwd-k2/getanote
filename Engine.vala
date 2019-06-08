@@ -7,7 +7,6 @@ namespace ShinGeta {
         public AsyncQueue <string> input_q;
 
         private uint wait;
-        private bool running;
         private Thread <void *> main_thread;
 
         /*
@@ -21,7 +20,6 @@ namespace ShinGeta {
         }
 
         public void run () {
-            this.running = true;
             this.main_thread = new Thread <void *> ("Engine Thread", main_loop);
         }
 
@@ -29,7 +27,7 @@ namespace ShinGeta {
             string? out_str;
             string? curr, next, back;
 
-            while (this.running) {
+            while (true) {
 
                 curr = this.input_q.pop ();
 
@@ -51,8 +49,6 @@ namespace ShinGeta {
                 output_event (out_str);
 
             }
-
-            return null;
 
         }
 

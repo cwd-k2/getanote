@@ -2,6 +2,8 @@ namespace ShinGeta {
 
     public class KeyMap : Object {
 
+        public string[] shift_keys = { "k", "d", "l", "s", "i", "o" };
+
         public string[] jis_layout = {
             "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-",
             "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "@",
@@ -14,12 +16,6 @@ namespace ShinGeta {
             "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[",
             "a", "s", "d", "f", "g", "h", "j", "k", "l", ";",
             "z", "x", "c", "v", "b", "n", "m", ",", ".", "/"
-        };
-
-        public string[] shift_keys = {
-            "k", "d",
-            "l", "s",
-            "i", "o"
         };
 
         public string?[] kana_neutral = {
@@ -57,23 +53,15 @@ namespace ShinGeta {
             "りゃ",   null, "じゃ", "ぎゃ", "にゃ", null, null, null, null, null
         };
 
-
-        public HashTable <string, string?> neutral;
-        public HashTable <string, string?> shift_m;
-        public HashTable <string, string?> shift_r;
-        public HashTable <string, string?> contr_m;
-        public HashTable <string, string?> contr_r;
         public string[] layout;
         public string   backspace;
+
+        private HashTable <string, string?> mapping;
 
         public KeyMap (string layout) {
             Object ();
 
-            this.neutral = new HashTable <string, string?> (str_hash, str_equal);
-            this.shift_m = new HashTable <string, string?> (str_hash, str_equal);
-            this.shift_r = new HashTable <string, string?> (str_hash, str_equal);
-            this.contr_m = new HashTable <string, string?> (str_hash, str_equal);
-            this.contr_r = new HashTable <string, string?> (str_hash, str_equal);
+            this.mapping = new HashTable <string, string?> (str_hash, str_equal);
 
             switch (layout) {
                 case "US":
@@ -88,12 +76,40 @@ namespace ShinGeta {
             }
 
             for (var i = 0; i < 42; i++) {
-                this.neutral.insert (this.layout[i], kana_neutral[i]);
-                this.shift_m.insert (this.layout[i], kana_shift_m[i]);
-                this.shift_r.insert (this.layout[i], kana_shift_r[i]);
-                this.contr_m.insert (this.layout[i], kana_contr_m[i]);
-                this.contr_r.insert (this.layout[i], kana_contr_r[i]);
+                string  k = this.layout[i];
+                string? c;
+
+                this.mapping.set (k, kana_neutral[i]);
+
+                if ((c = kana_shift_m[i]) != null) {
+                    this.mapping.set (string.join ("+", k, shift_keys[0]), c);
+                    this.mapping.set (string.join ("+", shift_keys[0], k), c);
+                    this.mapping.set (string.join ("+", k, shift_keys[1]), c);
+                    this.mapping.set (string.join ("+", shift_keys[1], k), c);
+                }
+
+                if ((c = kana_shift_r[i]) != null) {
+                    this.mapping.set (string.join ("+", k, shift_keys[2]), c);
+                    this.mapping.set (string.join ("+", shift_keys[2], k), c);
+                    this.mapping.set (string.join ("+", k, shift_keys[3]), c);
+                    this.mapping.set (string.join ("+", shift_keys[3], k), c);
+                }
+
+                if ((c = kana_contr_m[i]) != null) {
+                    this.mapping.set (string.join ("+", k, shift_keys[4]), c);
+                    this.mapping.set (string.join ("+", shift_keys[4], k), c);
+                }
+
+                if ((c = kana_contr_r[i]) != null) {
+                    this.mapping.set (string.join ("+", k, shift_keys[5]), c);
+                    this.mapping.set (string.join ("+", shift_keys[5], k), c);
+                }
+
             }
+        }
+
+        public string? interpret (string[] keys) {
+            return this.mapping.get (string.joinv ("+", keys));
         }
 
     }

@@ -29,7 +29,7 @@ namespace ShinGeta {
         }
 
         private void * main_loop () {
-            this.prev = null;
+            //this.prev = null;
             string? out_str;
 
             while (this.running) {
@@ -40,7 +40,7 @@ namespace ShinGeta {
 
                 if (this.prev != null && this.prev != this.curr) {
 
-                    out_str = interpret_shift_input (this.prev, this.curr);
+                    out_str = this.keymap.interpret ({this.prev, this.curr});
 
                     if (out_str != null) {
                         this.simultaneous = true;
@@ -61,7 +61,7 @@ namespace ShinGeta {
         }
 
         private void * subroutine () {
-            var out_str = this.keymap.neutral.get (this.curr);
+            var out_str = this.keymap.interpret ({this.curr});
 
             Thread.usleep (25000);
 
@@ -73,35 +73,6 @@ namespace ShinGeta {
             return null;
         }
 
-        private string? interpret_shift_input (string key1, string key2) {
-            switch (key1) {
-                case "k":
-                case "d":
-                    return this.keymap.shift_m.get (key2);
-                case "l":
-                case "s":
-                    return this.keymap.shift_r.get (key2);
-                case "i":
-                    return this.keymap.contr_m.get (key2);
-                case "o":
-                    return this.keymap.contr_r.get (key2);
-                default:
-                    switch (key2) {
-                        case "k":
-                        case "d":
-                            return this.keymap.shift_m.get (key1);
-                        case "l":
-                        case "s":
-                            return this.keymap.shift_r.get (key1);
-                        case "i":
-                            return this.keymap.contr_m.get (key1);
-                        case "o":
-                            return this.keymap.contr_r.get (key1);
-                        default:
-                            return null;
-                    }
-            }
-        }
     }
 
 }

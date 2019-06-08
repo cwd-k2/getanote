@@ -1,9 +1,9 @@
-namespace ShinGeta {
+namespace GetaNote {
     public class Application : Gtk.Application {
 
         public Application () {
             Object (
-                application_id: "com.github.cwd-k2.shingeta_vala",
+                application_id: "com.github.cwd-k2.getanote",
                 flags: ApplicationFlags.FLAGS_NONE
             );
         }
@@ -11,8 +11,8 @@ namespace ShinGeta {
         protected override void activate () {
 
             var window = new MainWindow (this);
-            var keymap = new KeyMap ("JIS");
-            var engine = new Engine (keymap, 20000);
+            var layout = new ShinGeta.Layout ("JIS");
+            var engine = new ShinGeta.Engine (layout, 20000);
 
             window.key_press_event.connect ( (_, key) => {
 
@@ -40,12 +40,12 @@ namespace ShinGeta {
                     key.time,
                     key.type);
 
-                if (key.str == keymap.backspace) {
+                if (key.str == layout.backspace) {
                     window.view.backspace ();
                     return true;
                 }
 
-                if (key.is_modifier != 1 && key.str in keymap.layout) {
+                if (key.is_modifier != 1 && key.str in layout.keys) {
                     engine.input_q.push (key.str);
                     return true;
                 }
@@ -58,6 +58,7 @@ namespace ShinGeta {
             });
 
             engine.run ();
+
             add_window (window);
         }
 

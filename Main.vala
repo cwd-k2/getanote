@@ -1,4 +1,4 @@
 public static int main (string[] args) {
-    ShinGeta.Application app = new ShinGeta.Application ();
+    var app = new GetaNote.Application ();
     return app.run ();
 }

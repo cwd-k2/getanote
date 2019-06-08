@@ -3,7 +3,7 @@ namespace ShinGeta {
 
         public signal void output_event (string str);
 
-        public KeyMap keymap;
+        public Layout layout;
         public AsyncQueue <string> input_q;
 
         private uint wait;
@@ -13,21 +13,16 @@ namespace ShinGeta {
         /*
          * wait: 同時押しのタイミングのズレの許容時間
          */
-        public Engine (KeyMap keymap, uint wait) {
+        public Engine (Layout layout, uint wait) {
             Object ();
             this.input_q = new AsyncQueue <string> ();
-            this.keymap = keymap;
+            this.layout = layout;
             this.wait = wait;
         }
 
         public void run () {
             this.running = true;
             this.main_thread = new Thread <void *> ("Engine Thread", main_loop);
-        }
-
-        public void stop () {
-            this.running = false;
-            this.main_thread.join ();
         }
 
         private void * main_loop () {
@@ -43,6 +38,7 @@ namespace ShinGeta {
                     Thread.usleep (this.wait);
                 }
 
+                // なくても取り出してみる
                 next = this.input_q.try_pop ();
 
                 out_str = interpret (curr, next, out back);
@@ -61,12 +57,12 @@ namespace ShinGeta {
         }
 
         private string interpret (string curr, string? next, out string back) {
-            var retval = this.keymap.mapping.get (string.join ("+", curr, next));
+            var retval = this.layout.layout.get (string.join ("+", curr, next));
             back = null;
 
             if (retval == null) {
                 back = next;
-                retval = this.keymap.mapping.get (curr);
+                retval = this.layout.layout.get (curr);
             }
 
             return retval;

@@ -1,4 +1,4 @@
-namespace ShinGeta {
+namespace GetaNote {
     public class MainWindow : Gtk.ApplicationWindow {
 
         public Gtk.Label label;

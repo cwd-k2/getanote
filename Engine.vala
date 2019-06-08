@@ -4,15 +4,20 @@ namespace ShinGeta {
         public signal void output_event (string str);
 
         public KeyMap keymap;
-        public AsyncQueue <string> event_key_queue;
+        public AsyncQueue <string> input_q;
 
+        private uint wait;
         private bool running;
         private Thread <void *> main_thread;
 
-        public Engine (KeyMap keymap) {
+        /*
+         * wait: 同時押しのタイミングのズレの許容時間
+         */
+        public Engine (KeyMap keymap, uint wait) {
             Object ();
-            this.event_key_queue = new AsyncQueue <string> ();
+            this.input_q = new AsyncQueue <string> ();
             this.keymap = keymap;
+            this.wait = wait;
         }
 
         public void run () {
@@ -31,18 +36,20 @@ namespace ShinGeta {
 
             while (this.running) {
 
-                curr = this.event_key_queue.pop ();
+                curr = this.input_q.pop ();
 
-                if (this.event_key_queue.length () < 1) {
-                    Thread.usleep (20000);
+                // 後がつっかえてたら待たない
+                if (this.input_q.length () < 1) {
+                    Thread.usleep (this.wait);
                 }
 
-                next = this.event_key_queue.try_pop ();
+                next = this.input_q.try_pop ();
 
                 out_str = interpret (curr, next, out back);
 
+                // 同時押しがシフトと解釈できなかったら押し戻す
                 if (back != null) {
-                    this.event_key_queue.push_front (back);
+                    this.input_q.push_front (back);
                 }
 
                 output_event (out_str);

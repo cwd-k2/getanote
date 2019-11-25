@@ -1,27 +1,20 @@
 namespace GetaNote {
     public class MainWindow : Gtk.ApplicationWindow {
-
-        public Gtk.Label label;
-        public Gtk.TextView view;
-        public Gtk.TextBuffer buffer;
-
-        public bool pass_to_ime;
+        private Gtk.TextView view;
 
         public MainWindow (Application app) {
             Object (
                 application: app
             );
+        }
 
-            this.set_position (Gtk.WindowPosition.CENTER);
-            this.set_size_request (600, 400);
-
-            this.buffer = new Gtk.TextBuffer (null);
-            this.view   = new Gtk.TextView.with_buffer (this.buffer);
-            this.view.set_wrap_mode (Gtk.WrapMode.WORD_CHAR);
-
+        construct {
             var header  = new Gtk.HeaderBar ();
             header.set_show_close_button (true);
             header.set_title ("下駄ノート");
+
+            this.view = new Gtk.TextView ();
+            this.view.set_wrap_mode (Gtk.WrapMode.WORD_CHAR);
 
             var copy_button = new Gtk.Button ();
             copy_button.set_label ("Copy");
@@ -32,29 +25,34 @@ namespace GetaNote {
             });
 
             var vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            var hbox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 
-            var ime_toggle = new Gtk.Switch ();
-            ime_toggle.set_active (true);
-            this.pass_to_ime = ime_toggle.get_active ();
-            ime_toggle.state_set.connect (() => {
-                this.pass_to_ime = ime_toggle.get_active ();
-                return false;
-            });
-
-            hbox.pack_end (ime_toggle, false, false, 10);
-            hbox.pack_end (new Gtk.Label ("ビルトインのFEPを有効化"), false, false, 5);
-
-            vbox.pack_start (this.view);
-            vbox.pack_end (hbox, false, false);
+            vbox.pack_start (view);
 
             header.pack_end (copy_button);
 
-            this.set_titlebar (header);
+            set_titlebar (header);
+            set_position (Gtk.WindowPosition.CENTER);
+            set_size_request (600, 400);
 
-            this.add (vbox);
+            add (vbox);
 
-            this.show_all ();
+            show_all ();
         }
+
+        public void cb_interpreter_output (string str) {
+            switch (str) {
+                case ".space":
+                    this.view.buffer.insert_at_cursor ("　", "　".length);
+                    break;
+                default:
+                    this.view.buffer.insert_at_cursor (str, str.length);
+                    break;
+            }
+        }
+
+        public void cb_interpreter_backspace () {
+            this.view.backspace ();
+        }
+
     }
 }
